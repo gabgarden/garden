@@ -1,9 +1,14 @@
-import Link from 'next/link'
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import SocialLinks from './SocialLinks'
 import { band } from '@/lib/content'
 
 // Rodapé persistente — contato acessível de qualquer página.
 export default function Footer() {
+  const t = useTranslations('common')
+
   return (
     <footer className="relative z-[2] border-t border-line bg-bg px-4 py-12 lg:px-8">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
@@ -21,7 +26,7 @@ export default function Footer() {
             {band.email}
           </a>
           <p className="mt-3 font-mono text-xs uppercase tracking-widest text-muted">
-            {band.city} — {band.state} · desde {band.since}
+            {band.city} — {band.state} · {t('sinceYear', { year: band.since })}
           </p>
         </div>
 

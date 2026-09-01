@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 // Linha de faixa sem prévia: só o link para a página da letra.
 export default function TrackLinkRow({ track, number, label }) {

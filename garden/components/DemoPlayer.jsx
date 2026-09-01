@@ -1,6 +1,7 @@
 'use client'
 
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { usePlayer } from '@/lib/PlayerContext'
 
 // Prévia direto da lista de Nossas músicas.
@@ -14,6 +15,7 @@ function fmt(s) {
 
 export default function DemoPlayer({ demo, number, label }) {
   const { state, play, pause, resume, promote } = usePlayer()
+  const t = useTranslations('player')
 
   const isThis = state.track?.slug === demo.slug
   const inPreview = isThis && state.previewLimit != null
@@ -32,13 +34,16 @@ export default function DemoPlayer({ demo, number, label }) {
   const elapsed = Math.round(progress * PREVIEW_SECONDS)
   let stateCaption = null
   if (previewPlaying) {
-    stateCaption = `Tocando prévia · 0:${String(elapsed).padStart(2, '0')} / 0:${PREVIEW_SECONDS}`
+    stateCaption = t('playingPreview', {
+      elapsed: String(elapsed).padStart(2, '0'),
+      limit: PREVIEW_SECONDS,
+    })
   } else if (previewEnded) {
-    stateCaption = 'Prévia completa'
+    stateCaption = t('previewComplete')
   } else if (fullPlaying) {
-    stateCaption = `Tocando · ${fmt(progress * state.duration)}`
+    stateCaption = t('playingTime', { time: fmt(progress * state.duration) })
   } else if (promoted) {
-    stateCaption = `Pausado · ${fmt(progress * state.duration)}`
+    stateCaption = t('pausedTime', { time: fmt(progress * state.duration) })
   }
 
   const titleRed = previewPlaying || fullPlaying
@@ -89,7 +94,7 @@ export default function DemoPlayer({ demo, number, label }) {
             <button
               type="button"
               onClick={previewTrigger}
-              aria-label={`Repetir prévia de ${demo.title}`}
+              aria-label={t('repeatPreview', { title: demo.title })}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:text-fg"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -100,13 +105,13 @@ export default function DemoPlayer({ demo, number, label }) {
             <button
               type="button"
               onClick={promote}
-              aria-label={`Continuar ouvindo ${demo.title}`}
+              aria-label={t('keepListeningAria', { title: demo.title })}
               className="flex items-center gap-2 rounded-full bg-accent py-2 pl-3 pr-4 font-mono text-[10px] uppercase tracking-widest text-bg transition-transform hover:scale-105 active:scale-95"
             >
               <svg width="9" height="11" viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">
                 <path d="M0 0l10 6L0 12V0z" />
               </svg>
-              Continuar ouvindo
+              {t('keepListening')}
             </button>
           </div>
         ) : (
@@ -114,7 +119,7 @@ export default function DemoPlayer({ demo, number, label }) {
             type="button"
             onClick={promoted ? fullToggle : previewTrigger}
             aria-label={`${
-              previewPlaying || fullPlaying ? 'Pausar' : 'Ouvir'
+              previewPlaying || fullPlaying ? t('pause') : t('listen')
             } ${demo.title}`}
             className={[
               'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-transform duration-200 hover:scale-105 active:scale-95',

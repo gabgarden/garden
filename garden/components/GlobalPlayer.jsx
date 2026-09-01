@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { Link, usePathname } from '@/i18n/navigation'
 import { usePlayer } from '@/lib/PlayerContext'
 
 // ─── Ícones inline (sem dependência extra) ─────────────────────────────────
@@ -110,7 +110,9 @@ export default function GlobalPlayer() {
   const { track, isPlaying, progress, duration, volume } = state
   const volRef = useRef(volume)
   const [minimized, setMinimized] = useState(false)
+  // Sem prefixo de idioma, então a comparação com /sons/<slug> vale nos dois.
   const pathname = usePathname()
+  const t = useTranslations('player')
 
   // Esc: encolhe a barra expandida; na pílula, fecha de vez.
   useEffect(() => {
@@ -164,7 +166,7 @@ export default function GlobalPlayer() {
     return (
       <div
         role="region"
-        aria-label="Player de áudio minimizado"
+        aria-label={t('regionMinimized')}
         className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-full border border-line px-4 py-2.5 shadow-2xl transition-transform duration-300 hover:scale-105"
         style={{
           background: 'color-mix(in srgb, var(--color-bg) 90%, transparent)',
@@ -176,7 +178,7 @@ export default function GlobalPlayer() {
         {/* Play/Pause rápido */}
         <button
           onClick={handlePlayPause}
-          aria-label={isPlaying ? 'Pausar' : 'Reproduzir'}
+          aria-label={isPlaying ? t('pause') : t('play')}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-bg transition-transform hover:scale-105 active:scale-95"
         >
           {isPlaying ? <IconPause size={10} /> : <IconPlay size={10} />}
@@ -220,20 +222,20 @@ export default function GlobalPlayer() {
         {/* Botão expandir */}
         <button
           onClick={() => setMinimized(false)}
-          aria-label="Expandir player"
+          aria-label={t('expand')}
           className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted transition-colors hover:text-fg"
-          title="Expandir player"
+          title={t('expand')}
         >
           <IconMaximize />
-          Expandir
+          {t('expandShort')}
         </button>
 
         {/* Fechar */}
         <button
           onClick={close}
-          aria-label="Fechar player"
+          aria-label={t('close')}
           className="text-muted transition-colors hover:text-fg"
-          title="Fechar (interrompe a faixa)"
+          title={t('closeHint')}
         >
           <IconClose />
         </button>
@@ -256,7 +258,7 @@ export default function GlobalPlayer() {
   return (
     <div
       role="region"
-      aria-label="Player de áudio"
+      aria-label={t('region')}
       style={{
         position: 'fixed',
         bottom: 0,
@@ -275,7 +277,7 @@ export default function GlobalPlayer() {
         aria-valuenow={Math.round(progress * 100)}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Progresso"
+        aria-label={t('progress')}
       >
         <div
           className="h-full bg-accent transition-[width] duration-100"
@@ -301,7 +303,7 @@ export default function GlobalPlayer() {
           {/* Esquerda — Play / Pause */}
           <button
             onClick={handlePlayPause}
-            aria-label={isPlaying ? 'Pausar' : 'Reproduzir'}
+            aria-label={isPlaying ? t('pause') : t('play')}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-bg transition-transform duration-200 hover:scale-105 active:scale-95"
           >
             {isPlaying ? <IconPause /> : <IconPlay />}
@@ -312,14 +314,14 @@ export default function GlobalPlayer() {
             <Link
               href={`/sons/${track.slug}`}
               className="group min-w-0 no-underline"
-              aria-label={`Ver letra de ${track.title}`}
+              aria-label={t('seeLyrics', { title: track.title })}
             >
               <p className="truncate font-display font-semibold leading-tight text-sm transition-colors group-hover:text-accent md:text-base">
                 {track.title}
                 <span className="ml-1.5 font-mono text-[10px] text-muted opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true">↗</span>
               </p>
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                {track.type} — {isPlaying ? 'Tocando' : 'Pausado'}
+                {track.type} — {isPlaying ? t('playing') : t('paused')}
               </p>
             </Link>
             <EqBars playing={isPlaying} />
@@ -333,7 +335,7 @@ export default function GlobalPlayer() {
             <div className="hidden items-center gap-2 md:flex">
               <button
                 onClick={toggleMute}
-                aria-label={volume === 0 ? 'Ativar som' : 'Silenciar'}
+                aria-label={volume === 0 ? t('unmute') : t('mute')}
                 className="text-muted transition-colors hover:text-fg"
               >
                 <IconVolume muted={volume === 0} />
@@ -345,7 +347,7 @@ export default function GlobalPlayer() {
                 step={0.02}
                 value={volume}
                 onChange={handleVolume}
-                aria-label="Volume"
+                aria-label={t('volume')}
                 className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-line"
                 style={{
                   accentColor: '#fff',
@@ -361,17 +363,17 @@ export default function GlobalPlayer() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setMinimized(true)}
-                aria-label="Minimizar player"
+                aria-label={t('minimize')}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-line/40 hover:text-fg"
-                title="Minimizar"
+                title={t('minimizeHint')}
               >
                 <IconMinimize />
               </button>
               <button
                 onClick={close}
-                aria-label="Fechar player"
+                aria-label={t('close')}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-line/40 hover:text-fg"
-                title="Fechar (interrompe a faixa)"
+                title={t('closeHint')}
               >
                 <IconClose size={10} />
               </button>
